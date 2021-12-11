@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>FromJSONToHTMLTable</title>
+    <style>
+        table,
+        th {
+            border: groove;
+            border-collapse: collapse;
+        }
+
+        td {
+            border: 1px solid black;
+        }
+
+        td,
+        th {
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper">
+    </div>
+
+    <script>
+        function fromJSONToHTMLTable(input) {
+            let array = JSON.parse(input);
+            let table = ["<table>"];
+            table.push(makeKeyRow(array));
+            array.forEach(obj => table.push(makeValueRow(obj)));
+            table.push('</table>');
+
+            function makeKeyRow(array) {
+                let header = '<tr>';
+                let keys = Object.keys(array[0]);
+                for (let key of keys) {
+                    header += '<th>' + escapeHtml(key + '') + '</th>'
+                }
+                header += '</tr>';
+                return header;
+            }
+
+            function makeValueRow(object) {
+                let row = '<tr>';
+                let values = Object.values(object);
+                for (let value of values) {
+                    row += '<td>' + escapeHtml(value + '') + '</td>';
+                }
+                row += '</tr>';
+                return row;
+            }
+
+            function escapeHtml(value) {
+                if (value instanceof Number) {
+                    return value;
+                }
+                return value
+                replace(/\\n/g, "\\n")
+                    .replace(/\\'/g, "\\'")
+                    .replace(/\\"/g, '\\"')
+                    .replace(/\\&/g, "\\&")
+                    .replace(/\\r/g, "\\r")
+                    .replace(/\\t/g, "\\t")
+                    .replace(/\\b/g, "\\b")
+                    .replace(/\\f/g, "\\f");
+            }
+
+            return table.join('\n');
+        }
+        window.onload = function () {
+            let container = document.getElementById('wrapper');
+            container.innerHTML = fromJSONToHTMLTable(['[{"Name":"Stamat","Price":5.5},{"Name":"Rumen","Price":6}]']);
+        };
+    </script>
+</body>
+
+</html>
